@@ -38,100 +38,100 @@ export const DoctorModal: React.FC<DoctorModalProps> = ({ isOpen, onClose }) => 
 
   const handleCopyDiagnostics = () => {
     if (!doctor) return;
-    const diag = `GHOSTLIGHT Doctor Diagnostics:
-- Rust Toolchain: ${doctor.rust_version}
-- Python Interpreter: ${doctor.python_version}
-- Pytest Version: ${doctor.pytest_version}
-- Docker Sandboxing: ${doctor.docker_available ? 'Available (Air-Gapped)' : 'Unavailable (Restricted Subprocess)'}
-- Security Model: ${doctor.security_status}`;
+    const diag = `GHOSTLIGHT Diagnostics:
+- Rust Engine: ${doctor.rust_version}
+- Python: ${doctor.python_version}
+- Pytest: ${doctor.pytest_version}
+- Sandbox: ${doctor.docker_available ? 'Docker Container (Air-Gapped)' : 'Restricted Subprocess'}
+- Policy: ${doctor.security_status}`;
     navigator.clipboard.writeText(diag);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 select-none">
-      <div className="w-full max-w-lg bg-canvas-900 border border-canvas-800 rounded-xl shadow-elevated overflow-hidden text-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 select-none">
+      <div className="w-full max-w-md bg-mac-window border border-mac-borderStrong rounded-xl shadow-mac-sheet overflow-hidden text-xs">
         {/* Header */}
-        <div className="p-3.5 bg-canvas-850 border-b border-canvas-800 flex items-center justify-between">
+        <div className="p-3 bg-mac-window border-b border-mac-border flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Cpu className="w-4 h-4 text-ghost-cyan" />
-            <h3 className="text-xs font-semibold text-slate-100 font-mono tracking-tight">
-              GHOSTLIGHT Environment Diagnostics
+            <Cpu className="w-4 h-4 text-mac-blue" />
+            <h3 className="text-xs font-semibold text-mac-text tracking-tight">
+              System Environment Diagnostics
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-white rounded hover:bg-canvas-800 transition btn-interactive"
+            className="p-1 text-mac-textSecondary hover:text-mac-text rounded hover:bg-mac-surface apple-btn"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Diagnostic Items */}
-        <div className="p-4 space-y-2.5">
-          <div className="p-2.5 bg-canvas-850 border border-canvas-800 rounded-md flex items-center justify-between">
-            <span className="text-slate-400 font-mono">Rust Engine Core:</span>
-            <span className="font-mono text-slate-100 font-semibold">{doctor?.rust_version || 'Inspecting...'}</span>
+        <div className="p-3.5 space-y-2">
+          <div className="p-2 bg-mac-surface border border-mac-border rounded-md flex items-center justify-between">
+            <span className="text-mac-textSecondary">Rust Engine Core:</span>
+            <span className="font-mono text-mac-text font-medium">{doctor?.rust_version || 'Inspecting...'}</span>
           </div>
 
-          <div className="p-2.5 bg-canvas-850 border border-canvas-800 rounded-md flex items-center justify-between">
-            <span className="text-slate-400 font-mono">Host Python:</span>
-            <span className="font-mono text-slate-200">{doctor?.python_version || 'Inspecting...'}</span>
+          <div className="p-2 bg-mac-surface border border-mac-border rounded-md flex items-center justify-between">
+            <span className="text-mac-textSecondary">Host Python:</span>
+            <span className="font-mono text-mac-text">{doctor?.python_version || 'Inspecting...'}</span>
           </div>
 
-          <div className="p-2.5 bg-canvas-850 border border-canvas-800 rounded-md flex items-center justify-between">
-            <span className="text-slate-400 font-mono">Host Pytest:</span>
-            <span className="font-mono text-slate-200">{doctor?.pytest_version || 'Inspecting...'}</span>
+          <div className="p-2 bg-mac-surface border border-mac-border rounded-md flex items-center justify-between">
+            <span className="text-mac-textSecondary">Host Pytest:</span>
+            <span className="font-mono text-mac-text">{doctor?.pytest_version || 'Inspecting...'}</span>
           </div>
 
-          <div className="p-2.5 bg-canvas-850 border border-canvas-800 rounded-md flex items-center justify-between">
-            <span className="text-slate-400 font-mono">Docker Sandbox:</span>
+          <div className="p-2 bg-mac-surface border border-mac-border rounded-md flex items-center justify-between">
+            <span className="text-mac-textSecondary">Docker Sandboxing:</span>
             <span
-              className={`font-mono px-2 py-0.5 rounded text-[10px] font-semibold flex items-center space-x-1 ${
+              className={`font-mono px-2 py-0.5 rounded text-2xs font-semibold flex items-center space-x-1 ${
                 doctor?.docker_available
-                  ? 'bg-emerald-950 text-emerald-300 border border-emerald-800/60'
-                  : 'bg-amber-950 text-amber-300 border border-amber-800/60'
+                  ? 'bg-emerald-950/40 text-mac-green border border-emerald-800/40'
+                  : 'bg-orange-950/40 text-mac-orange border border-orange-800/40'
               }`}
             >
               {doctor?.docker_available ? (
                 <>
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                  <CheckCircle2 className="w-3 h-3 text-mac-green" />
                   <span>Available (Air-Gapped)</span>
                 </>
               ) : (
                 <>
-                  <AlertTriangle className="w-3 h-3 text-amber-400" />
-                  <span>Unavailable (Subprocess Only)</span>
+                  <AlertTriangle className="w-3 h-3 text-mac-orange" />
+                  <span>Restricted Subprocess</span>
                 </>
               )}
             </span>
           </div>
 
-          <div className="p-2.5 bg-canvas-850 border border-canvas-800 rounded-md flex items-center justify-between">
-            <span className="text-slate-400 font-mono">Security Model:</span>
-            <span className="font-mono text-emerald-400 font-semibold flex items-center space-x-1 text-[11px]">
+          <div className="p-2 bg-mac-surface border border-mac-border rounded-md flex items-center justify-between">
+            <span className="text-mac-textSecondary">Security Model:</span>
+            <span className="font-medium text-mac-green flex items-center space-x-1 text-xs">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Strict Zero-Execution Static Scan</span>
+              <span>Zero-Execution Static Scan</span>
             </span>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-3 border-t border-canvas-800 bg-canvas-850 flex items-center justify-between">
+        <div className="p-3 border-t border-mac-border bg-mac-window flex items-center justify-between">
           <button
             onClick={handleCopyDiagnostics}
-            className="px-3 py-1 bg-canvas-800 hover:bg-canvas-750 border border-canvas-700 text-slate-300 rounded font-mono text-[11px] flex items-center space-x-1.5 transition btn-interactive"
+            className="px-3 py-1 bg-mac-surface hover:bg-mac-surfaceHover border border-mac-border text-mac-text rounded-md text-xs font-medium flex items-center space-x-1.5 apple-btn shadow-mac-button"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-mac-green" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? 'Copied' : 'Copy Diagnostics'}</span>
           </button>
 
           <button
             onClick={onClose}
-            className="px-4 py-1 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded transition font-medium btn-interactive"
+            className="px-4 py-1 bg-mac-surfaceActive hover:bg-mac-surfaceHover text-mac-text rounded-md text-xs font-medium apple-btn shadow-mac-button"
           >
-            Close
+            Done
           </button>
         </div>
       </div>
