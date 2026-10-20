@@ -91,7 +91,7 @@ pub fn extract_python_source(
     let source_bytes = source_code.as_bytes();
 
     let mut extractor = AstExtractor {
-        file_id: file_id.clone(),
+        _file_id: file_id.clone(),
         is_test_file,
         source_bytes,
         imports: Vec::new(),
@@ -128,7 +128,7 @@ pub fn extract_python_file<P: AsRef<Path>>(
 }
 
 struct AstExtractor<'a> {
-    file_id: FileId,
+    _file_id: FileId,
     is_test_file: bool,
     source_bytes: &'a [u8],
     imports: Vec<ImportStatement>,

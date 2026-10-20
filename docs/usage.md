@@ -89,19 +89,29 @@ Open your browser at `http://127.0.0.1:1420`.
 
 ## 3. Desktop Application Guide
 
-1. **Repository Selection**: Enter a local repository path in the top bar or select one of the pre-bundled test fixtures (`simple-python`, `complex-python`, `regression-python`).
+1. **Activity Rail & Navigation**:
+   - Use the far-left Activity Rail to toggle between primary developer workflows:
+     - **Codebase Explorer**: Search symbols, classes, functions, and files with instant filtering and tree/flat grouping.
+     - **Blast Radius**: Comprehensive change-impact breakdown with direct vs. transitive filters and interactive step-by-step causal chain expansion.
+     - **Codebase Insights**: Structural metrics, including top hub symbols (highest incoming dependents), coupling fan-out, circular dependency cycle detection, and external dependencies.
+     - **Doctor Diagnostics & Report Export**: Instant toolchain verification and one-click Markdown/JSON export.
 2. **Interactive Dependency Graph**:
-   - Pan and zoom freely using mouse drag or floating zoom controls.
-   - Click any node to open the **Node Details** panel.
-   - Use filter toggles in the top-right to filter out tests, files, or external imports.
-3. **Change Impact Calculation**:
-   - In Node Details, click **Calculate Change Impact**.
-   - Direct downstream dependents highlight with an amber glow; transitive ripples highlight with rose.
-   - Click **Explain Path** next to any affected entity to highlight the exact multi-hop causal chain on the graph canvas.
-4. **Targeted Test Execution**:
+   - High-fidelity dark developer canvas powered by Cytoscape and Dagre layout.
+   - Distinct geometric treatments: Rectangular cards for files/modules, rounded capsules for classes, cards for functions/methods, and diamond badges for test suites.
+   - Distinct edge types: Solid cyan for function calls, dashed slate for imports, solid violet for inheritance.
+   - Floating viewport controls: Zoom, Fit (`Space` / `F`), layout recalculation, and visibility filters (show/hide tests, files, externals).
+   - Interactive Legend overlay explaining all shapes and colors.
+3. **Change Impact & Causal Path Illumination**:
+   - Select any symbol, method, or file and click **Calculate Blast Radius**.
+   - Target entity illuminates in Electric Cyan; direct dependents highlight in Amber; transitive ripples highlight in Crimson.
+   - Unrelated background nodes and edges are gracefully dimmed (`opacity: 0.15`) for maximum signal-to-noise ratio.
+   - Expand any affected entity to view its exact propagation hops, and click **Illuminate Graph** to trace the causal chain with glowing cyan edges.
+4. **Targeted Test Execution & Sandbox**:
    - Switch to the **Candidate Tests** tab.
-   - Review selected candidate tests and their selection reasons (`DirectCall`, `TransitiveCall`).
-   - Check **"I explicitly authorize executing these candidate tests"**.
-   - Click **Run Authorized Tests** to execute in the sandbox and view real stdout/stderr output and failure reconciliation.
-5. **Report Export**:
-   - Click **Report** in the top bar to inspect or download the versioned Markdown/JSON intelligence report.
+   - Review selected candidate tests and their selection reasons (`DirectCall`, `TransitiveCall`, `DirectImport`, `NamingConvention`).
+   - Toggle sandbox strategy: Air-Gapped Docker container (network disabled, read-only rootfs) vs. Restricted Subprocess.
+   - Check authorization checkbox and click **Execute Candidate Tests**.
+   - Review evidence table comparing static predictions against observed outcomes, and inspect raw output in the terminal log viewer.
+5. **High-Density Status Bar**:
+   - Instant visibility into active repository path, content fingerprint (SHA-256), node/edge counts, detected dependency cycles, and sandbox isolation capability.
+   - Keyboard shortcuts: `Space` (fit graph), `Esc` (clear selection), `Ctrl+E` (export report), `Ctrl+D` (doctor diagnostics).

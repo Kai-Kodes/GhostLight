@@ -1,5 +1,4 @@
 use ghostlight_analysis::TestCandidate;
-use ghostlight_core::FileId;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -125,7 +124,7 @@ impl TestRunner {
                 return Err(ExecutionError::InvalidTargetPath(PathBuf::from(rel)));
             }
 
-            let full_path = self.repo_root.join(rel);
+            let _full_path = self.repo_root.join(rel);
             if !test_rel_paths.contains(&rel.to_string()) {
                 test_rel_paths.push(rel.to_string());
             }

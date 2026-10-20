@@ -25,7 +25,7 @@ pub fn check_docker_available() -> bool {
 pub fn run_in_docker(
     repo_root: &Path,
     test_rel_paths: &[String],
-    timeout: Duration,
+    _timeout: Duration,
     max_output_bytes: usize,
 ) -> Result<RawRunResult, ExecutionError> {
     if !check_docker_available() {

@@ -1,11 +1,12 @@
 import React from 'react';
 import {
   Play,
-  FileText,
   Activity,
   Layers,
   Network,
-  GitBranch,
+  Cpu,
+  FileDown,
+  Sparkles,
 } from 'lucide-react';
 
 interface TopBarProps {
@@ -33,107 +34,129 @@ export const TopBar: React.FC<TopBarProps> = ({
   onOpenDoctor,
   onSelectPresetFixture,
 }) => {
+  const currentFixture = repoPath.includes('/fixtures/')
+    ? repoPath.split('/fixtures/')[1]
+    : null;
+
   return (
-    <header className="h-14 bg-canvas-900 border-b border-slate-800 flex items-center justify-between px-4 z-20">
+    <header className="h-12 bg-canvas-900 border-b border-canvas-800 flex items-center justify-between px-3 z-30 select-none">
       {/* Brand & Repository Input */}
-      <div className="flex items-center space-x-4 flex-1">
-        <div className="flex items-center space-x-2">
-          <div className="w-7 h-7 rounded bg-gradient-to-tr from-cyan-500 to-sky-400 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-            <GitBranch className="w-4 h-4 text-canvas-950 font-bold" />
+      <div className="flex items-center space-x-3 flex-1 min-w-0">
+        {/* Brand Lockup */}
+        <div className="flex items-center space-x-2 shrink-0">
+          <div className="w-6 h-6 rounded bg-canvas-800 border border-cyan-500/40 flex items-center justify-center text-ghost-cyan shadow-glow-cyan">
+            <Sparkles className="w-3.5 h-3.5" />
           </div>
-          <span className="font-bold tracking-wider text-sm bg-gradient-to-r from-slate-100 to-slate-400 bg-clip-text text-transparent">
-            GHOSTLIGHT
-          </span>
+          <div className="flex flex-col">
+            <span className="font-mono font-bold tracking-wider text-xs text-slate-100 flex items-center space-x-1.5">
+              <span>GHOSTLIGHT</span>
+              <span className="text-[9px] font-normal px-1 py-0.2 rounded bg-canvas-800 text-ghost-cyan border border-cyan-500/20">
+                v0.1.0
+              </span>
+            </span>
+          </div>
         </div>
 
-        {/* Repository Path Input */}
-        <div className="flex items-center space-x-2 flex-1 max-w-xl">
-          <div className="relative flex-1">
+        <div className="w-px h-4 bg-canvas-800 shrink-0 hidden md:block" />
+
+        {/* Repository Path Input & Analyze Action */}
+        <div className="flex items-center space-x-1.5 flex-1 max-w-xl min-w-0">
+          <div className="relative flex-1 min-w-0">
             <input
               type="text"
               value={repoPath}
               onChange={(e) => setRepoPath(e.target.value)}
-              placeholder="Enter absolute path to Python repository..."
-              className="w-full bg-canvas-850 border border-slate-800 text-xs text-slate-200 px-3 py-1.5 rounded-md focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 font-mono"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') onScan();
+              }}
+              placeholder="Enter absolute repository path..."
+              className="w-full bg-canvas-850 border border-canvas-800 text-xs text-slate-200 px-2.5 py-1 rounded focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/40 font-mono tracking-tight transition"
             />
           </div>
 
           <button
             onClick={onScan}
             disabled={isLoading}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white rounded-md text-xs font-medium transition shadow-md shadow-cyan-600/20"
+            title="Scan repository and build dependency graph (Enter)"
+            className="flex items-center space-x-1.5 px-3 py-1 bg-cyan-600 hover:bg-cyan-500 active:scale-[0.98] disabled:opacity-50 text-canvas-950 font-semibold rounded text-xs transition shadow-subtle shrink-0 btn-interactive"
           >
             {isLoading ? (
               <Activity className="w-3.5 h-3.5 animate-spin" />
             ) : (
-              <Play className="w-3.5 h-3.5" />
+              <Play className="w-3.5 h-3.5 fill-current" />
             )}
-            <span>{isLoading ? 'Scanning...' : 'Analyze'}</span>
+            <span>{isLoading ? 'Scanning' : 'Analyze'}</span>
+            <kbd className="hidden sm:inline-block text-[9px] px-1 bg-cyan-700 text-cyan-100 rounded ml-0.5">
+              ↵
+            </kbd>
           </button>
         </div>
 
         {/* Quick Sample Selector */}
-        <div className="hidden lg:flex items-center space-x-1.5 text-xs text-slate-400">
-          <span className="text-[11px] text-slate-500">Fixtures:</span>
-          <button
-            onClick={() => onSelectPresetFixture('simple-python')}
-            className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[11px] transition"
-          >
-            simple
-          </button>
-          <button
-            onClick={() => onSelectPresetFixture('complex-python')}
-            className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[11px] transition"
-          >
-            complex
-          </button>
-          <button
-            onClick={() => onSelectPresetFixture('regression-python')}
-            className="px-2 py-0.5 bg-rose-950/60 border border-rose-900/50 hover:bg-rose-900/80 text-rose-300 rounded text-[11px] transition"
-          >
-            regression
-          </button>
+        <div className="hidden lg:flex items-center space-x-1 text-2xs font-mono shrink-0">
+          <span className="text-slate-500 mr-1">Fixtures:</span>
+          {[
+            { id: 'simple-python', label: 'simple' },
+            { id: 'complex-python', label: 'complex' },
+            { id: 'cycle-python', label: 'cycle' },
+            { id: 'regression-python', label: 'regression' },
+          ].map((f) => {
+            const isActive = currentFixture === f.id;
+            return (
+              <button
+                key={f.id}
+                onClick={() => onSelectPresetFixture(f.id)}
+                className={`px-2 py-0.5 rounded transition btn-interactive ${
+                  isActive
+                    ? 'bg-canvas-800 text-ghost-cyan border border-cyan-500/30'
+                    : 'bg-canvas-850 hover:bg-canvas-800 text-slate-400 hover:text-slate-200 border border-canvas-800'
+                }`}
+              >
+                {f.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Metrics Chips & Right Action Controls */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-2 shrink-0 ml-3">
         {/* Metric Badges */}
-        <div className="hidden sm:flex items-center space-x-2 bg-canvas-850 border border-slate-800 px-2.5 py-1 rounded-md text-xs">
-          <div className="flex items-center space-x-1 text-slate-400">
-            <Layers className="w-3.5 h-3.5 text-blue-400" />
-            <span className="font-mono text-slate-200">{fileCount}</span>
-            <span className="text-[10px]">files</span>
+        <div className="hidden sm:flex items-center space-x-2 bg-canvas-850 border border-canvas-800 px-2 py-0.5 rounded text-2xs font-mono">
+          <div className="flex items-center space-x-1 text-slate-400" title={`${fileCount} source files`}>
+            <Layers className="w-3 h-3 text-ghost-sky" />
+            <span className="text-slate-200">{fileCount}</span>
+            <span className="text-slate-500">files</span>
           </div>
-          <div className="w-px h-3 bg-slate-800" />
-          <div className="flex items-center space-x-1 text-slate-400">
-            <Network className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="font-mono text-slate-200">{nodeCount}</span>
-            <span className="text-[10px]">nodes</span>
-          </div>
-          <div className="w-px h-3 bg-slate-800" />
-          <div className="flex items-center space-x-1 text-slate-400">
-            <span className="font-mono text-slate-200">{edgeCount}</span>
-            <span className="text-[10px]">edges</span>
+          <div className="w-px h-2.5 bg-canvas-800" />
+          <div className="flex items-center space-x-1 text-slate-400" title={`${nodeCount} nodes, ${edgeCount} edges`}>
+            <Network className="w-3 h-3 text-ghost-cyan" />
+            <span className="text-slate-200">{nodeCount}</span>
+            <span className="text-slate-500">n</span>
+            <span className="text-slate-500">/</span>
+            <span className="text-slate-200">{edgeCount}</span>
+            <span className="text-slate-500">e</span>
           </div>
         </div>
 
-        {/* Doctor Diagnostics Button */}
+        {/* Doctor Action Button */}
         <button
           onClick={onOpenDoctor}
-          className="p-1.5 text-slate-400 hover:text-cyan-400 hover:bg-slate-800 rounded transition"
-          title="Doctor: Check System & Isolation Status"
+          title="System Diagnostics & Isolation Check"
+          className="flex items-center space-x-1 px-2 py-1 bg-canvas-850 hover:bg-canvas-800 border border-canvas-800 text-slate-300 rounded text-xs transition btn-interactive"
         >
-          <Activity className="w-4 h-4" />
+          <Cpu className="w-3.5 h-3.5 text-ghost-cyan" />
+          <span className="hidden md:inline text-2xs font-mono">Doctor</span>
         </button>
 
         {/* Export Report Button */}
         <button
           onClick={onOpenReport}
-          className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-md text-xs font-medium transition border border-slate-700/60"
+          title="Export Analysis Report"
+          className="flex items-center space-x-1 px-2.5 py-1 bg-canvas-800 hover:bg-canvas-750 border border-canvas-700 text-slate-200 rounded text-xs transition btn-interactive"
         >
-          <FileText className="w-3.5 h-3.5 text-cyan-400" />
-          <span>Report</span>
+          <FileDown className="w-3.5 h-3.5 text-ghost-sky" />
+          <span className="text-2xs font-mono font-medium">Export</span>
         </button>
       </div>
     </header>

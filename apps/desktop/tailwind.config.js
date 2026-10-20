@@ -9,25 +9,35 @@ export default {
     extend: {
       colors: {
         canvas: {
-          950: '#090a0f',
+          950: '#080a0f',
           900: '#0d1117',
-          850: '#131722',
-          800: '#161b26',
-          700: '#212636',
+          850: '#141820',
+          800: '#1c222e',
+          750: '#252e3d',
+          700: '#323d4e',
         },
         ghost: {
-          glow: '#00f2fe',
-          cyan: '#38bdf8',
-          emerald: '#10b981',
+          cyan: '#00f0ff',
+          sky: '#38bdf8',
+          ice: '#e0f2fe',
           amber: '#f59e0b',
           rose: '#f43f5e',
-          purple: '#a855f7',
-        }
+          emerald: '#10b981',
+          violet: '#a855f7',
+        },
       },
       fontFamily: {
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-      }
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Geist Mono', 'Fira Code', 'Menlo', 'monospace'],
+      },
+      fontSize: {
+        '2xs': ['0.65rem', { lineHeight: '0.85rem' }],
+      },
+      boxShadow: {
+        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.3)',
+        'elevated': '0 4px 12px 0 rgba(0, 0, 0, 0.45)',
+        'glow-cyan': '0 0 16px -2px rgba(0, 240, 255, 0.3)',
+      },
     },
   },
   plugins: [],
