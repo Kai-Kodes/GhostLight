@@ -6,7 +6,7 @@
 Ensure Rust 1.85+ and Node 22+ (with pnpm) are available on your system:
 
 ```bash
-git clone https://github.com/ghostlight-org/ghostlight.git
+git clone https://github.com/Kai-Kodes/GhostLight.git
 cd ghostlight
 cargo build --release
 ```

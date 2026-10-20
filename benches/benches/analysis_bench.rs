@@ -1,11 +1,10 @@
-use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
+use criterion::{black_box, criterion_group, criterion_main, Criterion, Throughput};
 use ghostlight_analysis::{AnalysisReport, ImpactAnalyzer, IncrementalEngine, RepositoryDelta};
 use ghostlight_core::{ContentHash, FileId, RepositoryFingerprint};
 use ghostlight_graph::build_dependency_graph;
-use ghostlight_parser::{extract_python_source, scan_repository, ScanOptions};
+use ghostlight_parser::extract_python_source;
 use std::collections::BTreeMap;
 use std::fs;
-use std::path::PathBuf;
 use tempfile::tempdir;
 
 const SAMPLE_PYTHON_MODULE: &str = r#"

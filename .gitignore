@@ -1,6 +1,7 @@
 # Rust / Cargo
 /target
-
+**/target/
+Cargo.lock.bak
 
 # Node / Frontend
 node_modules/
@@ -8,15 +9,32 @@ dist/
 .vite/
 *.local
 
-# Cache / Temp
-.DS_Store
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.log
+
+# Editor & IDE
+.vscode/
+.idea/
 *.swp
+*.swo
 *~
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Cache / Temp
 tmp/
 .coverage
-.pytest_cache
+.pytest_cache/
 __pycache__/
-*.pyc
+*.py[cod]
 
 # Benchmark outputs
-target/criterion
+target/criterion/

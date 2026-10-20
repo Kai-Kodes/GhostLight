@@ -18,7 +18,7 @@ import { DoctorModal } from './components/DoctorModal';
 import { AlertCircle, Network } from 'lucide-react';
 
 export function App() {
-  const [repoPath, setRepoPath] = useState('/home/redsheronin/ghostlight/fixtures/complex-python');
+  const [repoPath, setRepoPath] = useState('fixtures/complex-python');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -69,9 +69,9 @@ export function App() {
 
   // Fixture preset selector
   const handleSelectFixture = useCallback((name: string) => {
-    const fullPath = `/home/redsheronin/ghostlight/fixtures/${name}`;
-    setRepoPath(fullPath);
-    handleScan(fullPath);
+    const targetPath = `fixtures/${name}`;
+    setRepoPath(targetPath);
+    handleScan(targetPath);
   }, [handleScan]);
 
   // Initial load

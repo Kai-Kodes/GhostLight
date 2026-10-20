@@ -1,7 +1,6 @@
 use ghostlight_core::{ContentHash, FileId, NodeId, RepositoryFingerprint};
 use ghostlight_analysis::{
-    AnalysisReport, ImpactAnalyzer, ImpactType, IncrementalEngine, RepositoryDelta,
-    SelectionReason,
+    AnalysisReport, ImpactAnalyzer, ImpactType, RepositoryDelta,
 };
 use ghostlight_graph::build_dependency_graph;
 use ghostlight_parser::extract_python_source;

@@ -1,5 +1,5 @@
 use ghostlight_core::FileId;
-use ghostlight_parser::{extract_python_source, ParserError};
+use ghostlight_parser::extract_python_source;
 
 #[test]
 fn test_malformed_syntax_recovery() {

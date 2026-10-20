@@ -1,5 +1,5 @@
-use ghostlight_core::{Confidence, EdgeData, EdgeType, FileId, NodeId, ResolutionStatus};
-use ghostlight_graph::{build_dependency_graph, DependencyGraph, GraphQuery};
+use ghostlight_core::{FileId, NodeId};
+use ghostlight_graph::{build_dependency_graph, GraphQuery};
 use ghostlight_parser::extract_python_source;
 
 #[test]

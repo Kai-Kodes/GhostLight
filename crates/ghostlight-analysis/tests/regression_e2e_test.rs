@@ -1,4 +1,4 @@
-use ghostlight_analysis::{ImpactAnalyzer, SelectionReason};
+use ghostlight_analysis::ImpactAnalyzer;
 use ghostlight_core::{FileId, NodeId};
 use ghostlight_execution::TestRunner;
 use ghostlight_graph::build_dependency_graph;

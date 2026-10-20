@@ -15,7 +15,7 @@ version = "0.1.0"
 edition = "2021"
 authors = ["GHOSTLIGHT Contributors"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/ghostlight-org/ghostlight"
+repository = "https://github.com/Kai-Kodes/GhostLight"
 rust-version = "1.85.0"
 
 [workspace.dependencies]
