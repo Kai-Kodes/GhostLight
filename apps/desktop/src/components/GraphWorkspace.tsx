@@ -15,7 +15,7 @@ import {
 
 cytoscape.use(dagre);
 
-interface GraphViewProps {
+interface GraphWorkspaceProps {
   nodes: GraphNodeDto[];
   edges: GraphEdgeDto[];
   selectedNodeId: string | null;
@@ -24,7 +24,7 @@ interface GraphViewProps {
   activeExplanatoryPath: ExplanatoryPath | null;
 }
 
-export const GraphView: React.FC<GraphViewProps> = ({
+export const GraphWorkspace: React.FC<GraphWorkspaceProps> = ({
   nodes,
   edges,
   selectedNodeId,
@@ -44,7 +44,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Filter elements
+    // Filter elements based on layer toggles
     const filteredNodes = nodes.filter((n) => {
       if (!showTests && n.is_test) return false;
       if (!showFiles && n.kind === 'File') return false;
@@ -59,7 +59,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
 
     const cyElements = [
       ...filteredNodes.map((n) => {
-        const displayLabel = n.label.length > 24 ? n.label.slice(0, 21) + '…' : n.label;
+        const displayLabel = n.label.length > 28 ? n.label.slice(0, 25) + '…' : n.label;
         return {
           data: {
             id: n.id,
@@ -88,24 +88,24 @@ export const GraphView: React.FC<GraphViewProps> = ({
       boxSelectionEnabled: false,
       autounselectify: false,
       style: [
-        // Base node style
+        // Base node styling
         {
           selector: 'node',
           style: {
-            'background-color': '#0d131f',
+            'background-color': '#0d1017',
             'border-width': 1.5,
-            'border-color': '#2a364f',
+            'border-color': '#283142',
             'label': 'data(label)',
-            'color': '#cbd5e1',
+            'color': '#e2e8f0',
             'font-family': 'Inter, system-ui, sans-serif',
-            'font-size': '10px',
+            'font-size': '11px',
             'font-weight': 500,
             'text-valign': 'center',
             'text-halign': 'center',
-            'text-outline-color': '#080a0f',
+            'text-outline-color': '#07080a',
             'text-outline-width': 2,
-            'width': 130,
-            'height': 34,
+            'width': 140,
+            'height': 38,
             'shape': 'round-rectangle',
             'transition-property': 'background-color, border-color, opacity, underlay-opacity',
             'transition-duration': 0.15,
@@ -115,57 +115,57 @@ export const GraphView: React.FC<GraphViewProps> = ({
         {
           selector: 'node[kind = "File"]',
           style: {
-            'background-color': '#0a101d',
+            'background-color': '#0b0f17',
             'border-color': '#2563eb',
             'shape': 'round-rectangle',
-            'width': 140,
-            'height': 32,
+            'width': 150,
+            'height': 36,
             'font-family': 'JetBrains Mono, monospace',
-            'font-size': '9.5px',
+            'font-size': '10px',
           },
         },
         // Class Nodes
         {
           selector: 'node[kind = "Class"]',
           style: {
-            'background-color': '#160d26',
+            'background-color': '#140d1f',
             'border-color': '#9333ea',
             'shape': 'round-rectangle',
-            'width': 125,
-            'height': 36,
+            'width': 135,
+            'height': 40,
           },
         },
         // Function Nodes
         {
           selector: 'node[kind = "Function"]',
           style: {
-            'background-color': '#081a29',
+            'background-color': '#081624',
             'border-color': '#0284c7',
             'shape': 'round-rectangle',
-            'width': 120,
-            'height': 34,
+            'width': 130,
+            'height': 38,
           },
         },
         // Method Nodes
         {
           selector: 'node[kind = "Method"]',
           style: {
-            'background-color': '#08253a',
+            'background-color': '#0a1a2b',
             'border-color': '#38bdf8',
             'shape': 'round-rectangle',
-            'width': 125,
-            'height': 34,
+            'width': 135,
+            'height': 38,
           },
         },
         // Test Nodes
         {
           selector: 'node[kind = "Test"]',
           style: {
-            'background-color': '#072418',
+            'background-color': '#071f16',
             'border-color': '#059669',
             'shape': 'diamond',
-            'width': 130,
-            'height': 44,
+            'width': 135,
+            'height': 48,
             'color': '#6ee7b7',
           },
         },
@@ -173,14 +173,14 @@ export const GraphView: React.FC<GraphViewProps> = ({
         {
           selector: 'node[kind = "ExternalModule"]',
           style: {
-            'background-color': '#11141c',
+            'background-color': '#0f1218',
             'border-color': '#3f4b61',
             'border-style': 'dashed',
             'color': '#8091a8',
             'shape': 'round-rectangle',
-            'width': 115,
-            'height': 30,
-            'font-size': '9px',
+            'width': 120,
+            'height': 32,
+            'font-size': '9.5px',
           },
         },
         // Base edge style
@@ -191,7 +191,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
             'curve-style': 'bezier',
             'target-arrow-shape': 'triangle',
             'target-arrow-color': '#475569',
-            'line-color': '#334155',
+            'line-color': '#2a3344',
             'arrow-scale': 0.75,
             'opacity': 0.65,
             'transition-property': 'line-color, target-arrow-color, width, opacity',
@@ -204,19 +204,19 @@ export const GraphView: React.FC<GraphViewProps> = ({
           style: {
             'line-color': '#38bdf8',
             'target-arrow-color': '#38bdf8',
-            'width': 1.5,
-            'opacity': 0.85,
+            'width': 1.6,
+            'opacity': 0.8,
           },
         },
         // Imports edge
         {
           selector: 'edge[edge_type = "Imports"]',
           style: {
-            'line-color': '#64748b',
-            'target-arrow-color': '#64748b',
+            'line-color': '#57657d',
+            'target-arrow-color': '#57657d',
             'line-style': 'dashed',
             'width': 1.2,
-            'opacity': 0.7,
+            'opacity': 0.65,
           },
         },
         // Inherits edge
@@ -225,7 +225,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
           style: {
             'line-color': '#c084fc',
             'target-arrow-color': '#c084fc',
-            'width': 2,
+            'width': 2.2,
             'opacity': 0.9,
           },
         },
@@ -233,11 +233,11 @@ export const GraphView: React.FC<GraphViewProps> = ({
         {
           selector: '.selected',
           style: {
-            'border-color': '#00f0ff',
+            'border-color': '#38bdf8',
             'border-width': 2.5,
-            'underlay-color': '#00f0ff',
+            'underlay-color': '#38bdf8',
             'underlay-padding': 6,
-            'underlay-opacity': 0.3,
+            'underlay-opacity': 0.35,
             'z-index': 999,
           },
         },
@@ -245,9 +245,9 @@ export const GraphView: React.FC<GraphViewProps> = ({
         {
           selector: '.impact-target',
           style: {
-            'border-color': '#00f0ff',
+            'border-color': '#38bdf8',
             'border-width': 3.5,
-            'underlay-color': '#00f0ff',
+            'underlay-color': '#38bdf8',
             'underlay-padding': 8,
             'underlay-opacity': 0.45,
             'z-index': 1000,
@@ -279,18 +279,18 @@ export const GraphView: React.FC<GraphViewProps> = ({
         {
           selector: '.path-highlight',
           style: {
-            'line-color': '#00f0ff',
-            'target-arrow-color': '#00f0ff',
+            'line-color': '#38bdf8',
+            'target-arrow-color': '#38bdf8',
             'width': 3.5,
             'opacity': 1.0,
             'z-index': 950,
           },
         },
-        // Dimmed State (Unrelated background elements when focus or impact is active)
+        // Dimmed State for Unrelated Nodes
         {
           selector: '.dimmed',
           style: {
-            'opacity': 0.15,
+            'opacity': 0.12,
           },
         },
       ],
@@ -298,12 +298,12 @@ export const GraphView: React.FC<GraphViewProps> = ({
         name: 'dagre',
         rankDir: 'LR',
         nodeDimensionsIncludeLabels: true,
-        rankSep: 65,
-        nodeSep: 32,
+        rankSep: 70,
+        nodeSep: 35,
       } as any,
     });
 
-    // Tap event handler
+    // Events
     cy.on('tap', 'node', (evt: EventObject) => {
       const nodeData = evt.target.data();
       const originalNode = nodes.find((n) => n.id === nodeData.id) || null;
@@ -322,15 +322,14 @@ export const GraphView: React.FC<GraphViewProps> = ({
       cy.destroy();
       cyRef.current = null;
     };
-  }, [nodes, edges, showTests, showFiles, showExternals]);
+  }, [nodes, edges, showTests, showFiles, showExternals, onSelectNode]);
 
-  // Update dynamic highlight classes without re-running layout
+  // Dynamic Highlight Class Updates
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy) return;
 
     cy.batch(() => {
-      // Remove previous highlights and dimming
       cy.elements().removeClass(
         'selected impact-target impact-direct impact-transitive path-highlight dimmed'
       );
@@ -358,12 +357,10 @@ export const GraphView: React.FC<GraphViewProps> = ({
           } else if (transitiveIds.has(id)) {
             n.addClass('impact-transitive');
           } else {
-            // Unrelated node -> dim
             n.addClass('dimmed');
           }
         });
 
-        // Dim unrelated edges
         cy.edges().forEach((e) => {
           const s = e.source().id();
           const t = e.target().id();
@@ -379,7 +376,6 @@ export const GraphView: React.FC<GraphViewProps> = ({
         sel.addClass('selected');
       }
 
-      // Explanatory Path Highlight
       if (activeExplanatoryPath) {
         for (const step of activeExplanatoryPath.steps) {
           const edge = cy.edges(`[source = "${step.from}"][target = "${step.to}"]`);
@@ -392,40 +388,44 @@ export const GraphView: React.FC<GraphViewProps> = ({
     });
   }, [selectedNodeId, impactReport, activeExplanatoryPath]);
 
-  // Toolbar Actions
-  const handleZoomIn = useCallback(() => {
-    cyRef.current?.zoom(cyRef.current.zoom() * 1.25);
-  }, []);
+  // Center on node if selected externally
+  useEffect(() => {
+    if (selectedNodeId && cyRef.current) {
+      const el = cyRef.current.$(`node[id = "${selectedNodeId}"]`);
+      if (el.length > 0) {
+        cyRef.current.animate({
+          center: { eles: el },
+          duration: 350,
+          easing: 'ease-out-cubic' as any,
+        });
+      }
+    }
+  }, [selectedNodeId]);
 
-  const handleZoomOut = useCallback(() => {
-    cyRef.current?.zoom(cyRef.current.zoom() * 0.8);
-  }, []);
-
-  const handleFit = useCallback(() => {
-    cyRef.current?.fit(undefined, 40);
-  }, []);
-
+  const handleZoomIn = useCallback(() => cyRef.current?.zoom(cyRef.current.zoom() * 1.25), []);
+  const handleZoomOut = useCallback(() => cyRef.current?.zoom(cyRef.current.zoom() * 0.8), []);
+  const handleFit = useCallback(() => cyRef.current?.fit(undefined, 50), []);
   const handleRelayout = useCallback(() => {
     cyRef.current?.layout({
       name: 'dagre',
       rankDir: 'LR',
       nodeDimensionsIncludeLabels: true,
-      rankSep: 65,
-      nodeSep: 32,
+      rankSep: 70,
+      nodeSep: 35,
     } as any).run();
   }, []);
 
   return (
-    <div className="w-full h-full relative overflow-hidden bg-canvas-950 select-none">
-      {/* Cytoscape Canvas Container */}
+    <div className="w-full h-full relative overflow-hidden bg-obsidian-950 select-none">
+      {/* Cytoscape Canvas */}
       <div ref={containerRef} className="w-full h-full" />
 
-      {/* Floating Canvas Viewport Controls HUD */}
-      <div className="absolute top-3 right-3 flex items-center space-x-1 bg-canvas-900/90 border border-canvas-800 backdrop-blur-md p-1 rounded-lg shadow-elevated z-10">
+      {/* Floating Spatial Toolbar (Clean, Unobtrusive) */}
+      <div className="absolute bottom-5 left-5 flex items-center space-x-1.5 bg-obsidian-900/90 border border-obsidian-800 backdrop-blur-md px-2 py-1.5 rounded-lg shadow-dossier z-10 text-xs">
         <button
           onClick={handleZoomIn}
           title="Zoom In"
-          className="p-1.5 text-slate-300 hover:text-white hover:bg-canvas-800 rounded transition btn-interactive"
+          className="p-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 rounded transition btn-tactile"
         >
           <ZoomIn className="w-3.5 h-3.5" />
         </button>
@@ -433,7 +433,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
         <button
           onClick={handleZoomOut}
           title="Zoom Out"
-          className="p-1.5 text-slate-300 hover:text-white hover:bg-canvas-800 rounded transition btn-interactive"
+          className="p-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 rounded transition btn-tactile"
         >
           <ZoomOut className="w-3.5 h-3.5" />
         </button>
@@ -441,7 +441,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
         <button
           onClick={handleFit}
           title="Fit Graph to Viewport (Space)"
-          className="p-1.5 text-slate-300 hover:text-white hover:bg-canvas-800 rounded transition btn-interactive"
+          className="p-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 rounded transition btn-tactile"
         >
           <Maximize2 className="w-3.5 h-3.5" />
         </button>
@@ -449,21 +449,18 @@ export const GraphView: React.FC<GraphViewProps> = ({
         <button
           onClick={handleRelayout}
           title="Recalculate Layout"
-          className="p-1.5 text-slate-300 hover:text-white hover:bg-canvas-800 rounded transition btn-interactive"
+          className="p-1.5 text-slate-300 hover:text-white hover:bg-obsidian-800 rounded transition btn-tactile"
         >
           <RefreshCw className="w-3.5 h-3.5" />
         </button>
 
-        <div className="w-px h-3.5 bg-canvas-800" />
+        <div className="w-px h-3.5 bg-obsidian-800" />
 
-        {/* Filter Toggles */}
+        {/* Visibility Toggles */}
         <button
           onClick={() => setShowTests(!showTests)}
-          title={showTests ? 'Hide Test Nodes' : 'Show Test Nodes'}
-          className={`px-2 py-1 text-2xs font-mono rounded flex items-center space-x-1 transition btn-interactive ${
-            showTests
-              ? 'bg-canvas-800 text-emerald-400 border border-emerald-500/20'
-              : 'text-slate-500 hover:text-slate-300'
+          className={`px-2 py-1 rounded text-2xs font-mono flex items-center space-x-1 transition btn-tactile ${
+            showTests ? 'bg-obsidian-800 text-signal-emerald' : 'text-slate-500 hover:text-slate-300'
           }`}
         >
           {showTests ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
@@ -472,11 +469,8 @@ export const GraphView: React.FC<GraphViewProps> = ({
 
         <button
           onClick={() => setShowFiles(!showFiles)}
-          title={showFiles ? 'Hide File Nodes' : 'Show File Nodes'}
-          className={`px-2 py-1 text-2xs font-mono rounded flex items-center space-x-1 transition btn-interactive ${
-            showFiles
-              ? 'bg-canvas-800 text-blue-400 border border-blue-500/20'
-              : 'text-slate-500 hover:text-slate-300'
+          className={`px-2 py-1 rounded text-2xs font-mono flex items-center space-x-1 transition btn-tactile ${
+            showFiles ? 'bg-obsidian-800 text-blue-400' : 'text-slate-500 hover:text-slate-300'
           }`}
         >
           {showFiles ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
@@ -485,118 +479,81 @@ export const GraphView: React.FC<GraphViewProps> = ({
 
         <button
           onClick={() => setShowExternals(!showExternals)}
-          title={showExternals ? 'Hide External Modules' : 'Show External Modules'}
-          className={`px-2 py-1 text-2xs font-mono rounded flex items-center space-x-1 transition btn-interactive ${
-            showExternals
-              ? 'bg-canvas-800 text-slate-300 border border-canvas-750'
-              : 'text-slate-500 hover:text-slate-300'
+          className={`px-2 py-1 rounded text-2xs font-mono flex items-center space-x-1 transition btn-tactile ${
+            showExternals ? 'bg-obsidian-800 text-slate-300' : 'text-slate-500 hover:text-slate-300'
           }`}
         >
           {showExternals ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
           <span>Externals</span>
         </button>
 
-        <div className="w-px h-3.5 bg-canvas-800" />
+        <div className="w-px h-3.5 bg-obsidian-800" />
 
         {/* Legend Button */}
         <button
           onClick={() => setShowLegend(!showLegend)}
           title="Graph Symbol Legend"
-          className={`p-1.5 rounded transition btn-interactive ${
-            showLegend
-              ? 'bg-canvas-800 text-ghost-cyan'
-              : 'text-slate-400 hover:text-slate-200'
+          className={`p-1.5 rounded transition btn-tactile ${
+            showLegend ? 'bg-obsidian-800 text-signal-cyan' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <HelpCircle className="w-3.5 h-3.5" />
         </button>
       </div>
 
-      {/* Floating Legend Overlay */}
+      {/* Legend Popover */}
       {showLegend && (
-        <div className="absolute top-14 right-3 w-64 bg-canvas-900/95 border border-canvas-800 backdrop-blur-md p-3 rounded-lg shadow-elevated z-20 text-xs">
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-canvas-800">
-            <span className="font-mono font-semibold text-slate-200 text-2xs tracking-wider uppercase">
+        <div className="absolute bottom-16 left-5 w-64 bg-obsidian-900/95 border border-obsidian-750 backdrop-blur-md p-3.5 rounded-xl shadow-dossier z-20 text-xs">
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-obsidian-800">
+            <span className="font-semibold text-slate-200 text-2xs uppercase tracking-wider font-mono">
               Graph Geometry Legend
             </span>
-            <button
-              onClick={() => setShowLegend(false)}
-              className="text-slate-400 hover:text-white"
-            >
+            <button onClick={() => setShowLegend(false)} className="text-slate-400 hover:text-white">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          {/* Node Kinds */}
-          <div className="space-y-1.5 font-mono text-[11px]">
+          <div className="space-y-1.5 font-mono text-2xs">
             <div className="flex items-center justify-between">
-              <span className="flex items-center space-x-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-blue-600/40 border border-blue-400 inline-block" />
+              <span className="flex items-center space-x-2">
+                <span className="w-2.5 h-2.5 rounded-sm bg-blue-600/30 border border-blue-400" />
                 <span className="text-slate-300">File / Module</span>
               </span>
-              <span className="text-[10px] text-slate-500">Box</span>
+              <span className="text-slate-500">Box</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="flex items-center space-x-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-purple-600/40 border border-purple-400 inline-block" />
+              <span className="flex items-center space-x-2">
+                <span className="w-2.5 h-2.5 rounded-sm bg-purple-600/30 border border-purple-400" />
                 <span className="text-slate-300">Class</span>
               </span>
-              <span className="text-[10px] text-slate-500">Capsule</span>
+              <span className="text-slate-500">Capsule</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="flex items-center space-x-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-sky-600/40 border border-sky-400 inline-block" />
+              <span className="flex items-center space-x-2">
+                <span className="w-2.5 h-2.5 rounded-sm bg-sky-600/30 border border-sky-400" />
                 <span className="text-slate-300">Function / Method</span>
               </span>
-              <span className="text-[10px] text-slate-500">Card</span>
+              <span className="text-slate-500">Card</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="flex items-center space-x-1.5">
-                <span className="w-2.5 h-2.5 rotate-45 bg-emerald-600/40 border border-emerald-400 inline-block" />
-                <span className="text-slate-300">Candidate Test</span>
+              <span className="flex items-center space-x-2">
+                <span className="w-2.5 h-2.5 rotate-45 bg-emerald-600/30 border border-emerald-400" />
+                <span className="text-slate-300">Test Suite</span>
               </span>
-              <span className="text-[10px] text-slate-500">Diamond</span>
+              <span className="text-slate-500">Diamond</span>
             </div>
           </div>
 
-          <div className="my-2 border-t border-canvas-800" />
+          <div className="my-2 border-t border-obsidian-800" />
 
-          {/* Edge Types */}
-          <div className="space-y-1.5 font-mono text-[11px]">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center space-x-1.5">
-                <span className="w-4 h-0.5 bg-sky-400 inline-block" />
-                <span className="text-slate-300">Function Call</span>
-              </span>
-              <span className="text-[10px] text-sky-400">Solid Cyan</span>
+          <div className="space-y-1 font-mono text-2xs">
+            <div className="flex items-center space-x-2 text-signal-amber">
+              <span className="w-2 h-2 rounded-full bg-signal-amber" />
+              <span>Direct Downstream Impact</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="flex items-center space-x-1.5">
-                <span className="w-4 h-0.5 border-t border-dashed border-slate-400 inline-block" />
-                <span className="text-slate-300">Import</span>
-              </span>
-              <span className="text-[10px] text-slate-400">Dashed Slate</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="flex items-center space-x-1.5">
-                <span className="w-4 h-0.5 bg-purple-400 inline-block" />
-                <span className="text-slate-300">Inheritance</span>
-              </span>
-              <span className="text-[10px] text-purple-400">Solid Violet</span>
-            </div>
-          </div>
-
-          <div className="my-2 border-t border-canvas-800" />
-
-          {/* Impact Status */}
-          <div className="space-y-1 font-mono text-[10px]">
-            <div className="flex items-center space-x-1.5 text-amber-400">
-              <span className="w-2 h-2 rounded-full bg-amber-400" />
-              <span>Direct Impact (Immediate dependent)</span>
-            </div>
-            <div className="flex items-center space-x-1.5 text-rose-400">
-              <span className="w-2 h-2 rounded-full bg-rose-400" />
-              <span>Transitive Impact (Multi-hop dependent)</span>
+            <div className="flex items-center space-x-2 text-signal-rose">
+              <span className="w-2 h-2 rounded-full bg-signal-rose" />
+              <span>Transitive Impact Ripple</span>
             </div>
           </div>
         </div>

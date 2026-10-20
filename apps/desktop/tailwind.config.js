@@ -8,18 +8,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        canvas: {
-          950: '#080a0f',
-          900: '#0d1117',
-          850: '#141820',
-          800: '#1c222e',
-          750: '#252e3d',
-          700: '#323d4e',
+        obsidian: {
+          950: '#07080a',
+          900: '#0c0e12',
+          850: '#12151b',
+          800: '#191d25',
+          750: '#222834',
+          700: '#2d3545',
+          600: '#3f495d',
         },
-        ghost: {
-          cyan: '#00f0ff',
-          sky: '#38bdf8',
-          ice: '#e0f2fe',
+        signal: {
+          cyan: '#38bdf8',
           amber: '#f59e0b',
           rose: '#f43f5e',
           emerald: '#10b981',
@@ -31,12 +30,15 @@ export default {
         mono: ['JetBrains Mono', 'Geist Mono', 'Fira Code', 'Menlo', 'monospace'],
       },
       fontSize: {
-        '2xs': ['0.65rem', { lineHeight: '0.85rem' }],
+        '2xs': ['0.6875rem', { lineHeight: '0.95rem' }],
+        'xs': ['0.75rem', { lineHeight: '1.05rem' }],
+        'sm': ['0.8125rem', { lineHeight: '1.2rem' }],
       },
       boxShadow: {
-        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.3)',
-        'elevated': '0 4px 12px 0 rgba(0, 0, 0, 0.45)',
-        'glow-cyan': '0 0 16px -2px rgba(0, 240, 255, 0.3)',
+        'dossier': '0 12px 32px -4px rgba(0, 0, 0, 0.7), 0 4px 12px -2px rgba(0, 0, 0, 0.5)',
+        'modal': '0 24px 48px -12px rgba(0, 0, 0, 0.85)',
+        'glow-cyan': '0 0 20px -3px rgba(56, 189, 248, 0.35)',
+        'glow-amber': '0 0 20px -3px rgba(245, 158, 11, 0.35)',
       },
     },
   },

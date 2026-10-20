@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   ExplanatoryPath,
   GraphExportDto,
@@ -6,19 +6,15 @@ import {
   ImpactReport,
   ScanResult,
 } from './types';
-import { analyzeImpact, fetchGraph, scanRepository, getDoctor } from './services/api';
-import { TopBar } from './components/TopBar';
-import { ActivityRail, ActiveSidebarTab } from './components/ActivityRail';
-import { StatusBar } from './components/StatusBar';
-import { GraphView } from './components/GraphView';
-import { NodeDetails } from './components/NodeDetails';
-import { ImpactPanel } from './components/ImpactPanel';
-import { RepoOverviewPanel } from './components/RepoOverviewPanel';
-import { TestRunnerPanel } from './components/TestRunnerPanel';
-import { ExplorerPanel } from './components/ExplorerPanel';
+import { analyzeImpact, fetchGraph, scanRepository } from './services/api';
+import { TopNavigation } from './components/TopNavigation';
+import { GraphWorkspace } from './components/GraphWorkspace';
+import { UnifiedInspector } from './components/UnifiedInspector';
+import { InsightsView } from './components/InsightsView';
+import { QuickSearchPalette } from './components/QuickSearchPalette';
 import { ReportModal } from './components/ReportModal';
 import { DoctorModal } from './components/DoctorModal';
-import { FolderGit2, AlertCircle } from 'lucide-react';
+import { AlertCircle, Network } from 'lucide-react';
 
 export function App() {
   const [repoPath, setRepoPath] = useState('/home/redsheronin/ghostlight/fixtures/complex-python');
@@ -33,17 +29,15 @@ export function App() {
     edge_count: 0,
   });
 
-  const [dockerAvailable, setDockerAvailable] = useState<boolean>(false);
-
   const [selectedNode, setSelectedNode] = useState<GraphNodeDto | null>(null);
   const [impactReport, setImpactReport] = useState<ImpactReport | null>(null);
   const [activeExplanatoryPath, setActiveExplanatoryPath] = useState<ExplanatoryPath | null>(null);
 
-  // Active sidebar workflow tab ('explorer' | 'impact' | 'insights')
-  const [sidebarTab, setSidebarTab] = useState<ActiveSidebarTab>('explorer');
-  // Right inspector tab ('Details' | 'Tests')
-  const [rightTab, setRightTab] = useState<'Details' | 'Tests'>('Details');
+  // View mode: 'graph' (interactive map) or 'insights' (full-page topology dossier)
+  const [viewMode, setViewMode] = useState<'graph' | 'insights'>('graph');
 
+  // Modals
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [isDoctorOpen, setIsDoctorOpen] = useState(false);
 
@@ -68,8 +62,8 @@ export function App() {
     }
   }, [repoPath]);
 
-  // Preset fixture selector
-  const handleSelectPresetFixture = useCallback((name: string) => {
+  // Fixture preset selector
+  const handleSelectFixture = useCallback((name: string) => {
     const fullPath = `/home/redsheronin/ghostlight/fixtures/${name}`;
     setRepoPath(fullPath);
     handleScan(fullPath);
@@ -78,33 +72,26 @@ export function App() {
   // Initial load
   useEffect(() => {
     handleScan();
-    getDoctor()
-      .then((doc) => setDockerAvailable(doc.docker_available))
-      .catch(() => setDockerAvailable(false));
   }, []);
 
   // When node is selected
   const handleSelectNode = useCallback((node: GraphNodeDto | null) => {
     setSelectedNode(node);
-    if (node) {
-      setRightTab('Details');
-    }
   }, []);
 
   const handleSelectNodeById = useCallback((nodeId: string) => {
     const node = graphData.nodes.find((n) => n.id === nodeId) || null;
     setSelectedNode(node);
-    if (node) {
-      setRightTab('Details');
-    }
+    setViewMode('graph');
   }, [graphData.nodes]);
 
   // Run impact calculation on a node
   const handleAnalyzeImpact = useCallback(async (node: GraphNodeDto) => {
     if (!node.file_id && node.kind !== 'File') {
-      setErrorMsg(`Cannot analyze impact on external entity "${node.label}" (no local file definition). Please select an internal symbol or file.`);
+      setErrorMsg(`Cannot analyze impact on external entity "${node.label}" (no local source file).`);
       return;
     }
+
     setIsLoading(true);
     try {
       const isFile = node.kind === 'File';
@@ -120,11 +107,7 @@ export function App() {
 
       const report = await analyzeImpact(repoPath, fileArg, symbolArg);
       setImpactReport(report);
-      setSidebarTab('impact');
-
-      if (report.candidate_tests.length > 0) {
-        setRightTab('Tests');
-      }
+      setSelectedNode(node);
     } catch (err: any) {
       setErrorMsg(`Impact analysis failed: ${err?.message || err}`);
     } finally {
@@ -132,53 +115,24 @@ export function App() {
     }
   }, [repoPath]);
 
-  // Cycle detection count for status bar
-  const cycleCount = useMemo(() => {
-    const adj: Record<string, string[]> = {};
-    for (const edge of graphData.edges) {
-      if (edge.edge_type === 'Imports' || edge.edge_type === 'Calls') {
-        if (!adj[edge.source]) adj[edge.source] = [];
-        adj[edge.source].push(edge.target);
-      }
-    }
-
-    let count = 0;
-    const visited: Record<string, boolean> = {};
-    const inStack: Record<string, boolean> = {};
-
-    const dfs = (curr: string) => {
-      visited[curr] = true;
-      inStack[curr] = true;
-
-      for (const next of adj[curr] || []) {
-        if (!visited[next]) {
-          dfs(next);
-        } else if (inStack[next]) {
-          count++;
-        }
-      }
-
-      inStack[curr] = false;
-    };
-
-    for (const node of graphData.nodes) {
-      if (!visited[node.id]) {
-        dfs(node.id);
-      }
-    }
-
-    return count;
-  }, [graphData]);
-
-  // Keyboard shortcut listeners
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return;
       }
-      if (e.key === 'Escape') {
-        setSelectedNode(null);
-        setActiveExplanatoryPath(null);
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      } else if (e.key === '/' && !isSearchOpen) {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      } else if (e.key === 'Escape') {
+        if (selectedNode || impactReport) {
+          setSelectedNode(null);
+          setActiveExplanatoryPath(null);
+        }
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'e') {
         e.preventDefault();
         setIsReportOpen((prev) => !prev);
@@ -190,12 +144,12 @@ export function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [selectedNode, impactReport, isSearchOpen]);
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-canvas-950 font-sans overflow-hidden select-none">
+    <div className="h-screen w-screen flex flex-col bg-obsidian-950 font-sans overflow-hidden select-none">
       {/* Top Application Header */}
-      <TopBar
+      <TopNavigation
         repoPath={repoPath}
         setRepoPath={setRepoPath}
         onScan={() => handleScan()}
@@ -203,150 +157,116 @@ export function App() {
         fileCount={scanResult?.file_count || 0}
         nodeCount={graphData.node_count}
         edgeCount={graphData.edge_count}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
         onOpenReport={() => setIsReportOpen(true)}
         onOpenDoctor={() => setIsDoctorOpen(true)}
-        onSelectPresetFixture={handleSelectPresetFixture}
+        onSelectFixture={handleSelectFixture}
+        onOpenSearchPalette={() => setIsSearchOpen(true)}
       />
 
-      {/* Error Alert Notification */}
+      {/* Error Notification Bar */}
       {errorMsg && (
-        <div className="bg-rose-950/80 border-b border-rose-800 px-4 py-2 flex items-center justify-between text-rose-200 text-xs z-30">
+        <div className="bg-rose-950/80 border-b border-rose-850 px-4 py-2 flex items-center justify-between text-rose-200 text-xs z-30">
           <div className="flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
             <span className="font-mono">{errorMsg}</span>
           </div>
           <button
             onClick={() => setErrorMsg(null)}
-            className="text-rose-400 hover:text-white text-2xs font-mono uppercase underline ml-4 btn-interactive"
+            className="text-rose-400 hover:text-white text-2xs font-mono uppercase underline ml-4 btn-tactile"
           >
             Dismiss
           </button>
         </div>
       )}
 
-      {/* Main Workbench Layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Far-left Activity Rail */}
-        <ActivityRail
-          activeTab={sidebarTab}
-          onSelectTab={setSidebarTab}
-          impactCount={impactReport?.total_affected || null}
-          onOpenDoctor={() => setIsDoctorOpen(true)}
-          onOpenReport={() => setIsReportOpen(true)}
-        />
+      {/* Main Workspace Body */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {viewMode === 'graph' ? (
+          <>
+            {/* Full-Bleed Graph Canvas */}
+            <main className="flex-1 h-full relative overflow-hidden bg-obsidian-950">
+              {graphData.nodes.length === 0 && !isLoading ? (
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
+                  <Network className="w-12 h-12 mb-3 opacity-20 text-signal-cyan" />
+                  <h3 className="text-sm font-semibold text-slate-300 mb-1">
+                    No Codebase Analyzed
+                  </h3>
+                  <p className="text-xs max-w-sm text-slate-500">
+                    Select a fixture in the header bar to construct an evidence-backed dependency graph.
+                  </p>
+                </div>
+              ) : (
+                <GraphWorkspace
+                  nodes={graphData.nodes}
+                  edges={graphData.edges}
+                  selectedNodeId={selectedNode?.id || impactReport?.target_id || null}
+                  onSelectNode={handleSelectNode}
+                  impactReport={impactReport}
+                  activeExplanatoryPath={activeExplanatoryPath}
+                />
+              )}
+            </main>
 
-        {/* Left Side Workflow Panel */}
-        <aside className="w-80 bg-canvas-900 border-r border-canvas-800 flex flex-col shrink-0 overflow-hidden">
-          {sidebarTab === 'explorer' && (
-            <ExplorerPanel
-              nodes={graphData.nodes}
-              selectedNodeId={selectedNode?.id || null}
-              onSelectNode={handleSelectNode}
-            />
-          )}
-
-          {sidebarTab === 'impact' && (
-            <ImpactPanel
-              impactReport={impactReport}
-              onClearImpact={() => {
-                setImpactReport(null);
-                setActiveExplanatoryPath(null);
-              }}
-              onSelectExplanatoryPath={setActiveExplanatoryPath}
-              activePath={activeExplanatoryPath}
-              onSelectNodeById={handleSelectNodeById}
-            />
-          )}
-
-          {sidebarTab === 'insights' && (
-            <RepoOverviewPanel
-              nodes={graphData.nodes}
-              edges={graphData.edges}
-              scanResult={scanResult}
-              onSelectNodeById={handleSelectNodeById}
-            />
-          )}
-        </aside>
-
-        {/* Center Interactive Graph Canvas */}
-        <main className="flex-1 relative overflow-hidden bg-canvas-950">
-          {graphData.nodes.length === 0 && !isLoading ? (
-            <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
-              <FolderGit2 className="w-12 h-12 mb-3 opacity-25 text-ghost-cyan" />
-              <h3 className="text-xs font-semibold text-slate-300 mb-1 font-mono">
-                No Codebase Analyzed
-              </h3>
-              <p className="text-[11px] max-w-sm text-slate-500">
-                Specify a repository directory in the bar above or select a test fixture to construct an evidence-backed dependency graph.
-              </p>
-            </div>
-          ) : (
-            <GraphView
-              nodes={graphData.nodes}
-              edges={graphData.edges}
-              selectedNodeId={selectedNode?.id || null}
-              onSelectNode={handleSelectNode}
-              impactReport={impactReport}
-              activeExplanatoryPath={activeExplanatoryPath}
-            />
-          )}
-        </main>
-
-        {/* Right Inspection & Test Action Panel */}
-        <aside className="w-80 bg-canvas-900 border-l border-canvas-800 flex flex-col shrink-0 overflow-hidden">
-          {/* Sub-tab navigation */}
-          <div className="flex border-b border-canvas-800 bg-canvas-850 px-2 py-1 space-x-1">
-            <button
-              onClick={() => setRightTab('Details')}
-              className={`flex-1 py-1 text-center rounded text-2xs font-mono font-medium transition btn-interactive ${
-                rightTab === 'Details'
-                  ? 'bg-canvas-800 text-slate-100 border border-canvas-750 shadow-subtle'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Node Inspector
-            </button>
-            <button
-              onClick={() => setRightTab('Tests')}
-              className={`flex-1 py-1 text-center rounded text-2xs font-mono font-medium transition btn-interactive ${
-                rightTab === 'Tests'
-                  ? 'bg-canvas-800 text-emerald-400 border border-emerald-500/20 shadow-subtle'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Candidate Tests{' '}
-              {impactReport?.candidate_tests.length ? `(${impactReport.candidate_tests.length})` : ''}
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-hidden">
-            {rightTab === 'Details' ? (
-              <NodeDetails
+            {/* Contextual Analysis Dossier (Sliding Right Inspector) */}
+            {(selectedNode || impactReport) && (
+              <UnifiedInspector
                 node={selectedNode}
                 edges={graphData.edges}
+                impactReport={impactReport}
+                activePath={activeExplanatoryPath}
                 onAnalyzeImpact={handleAnalyzeImpact}
                 onSelectNodeById={handleSelectNodeById}
-              />
-            ) : (
-              <TestRunnerPanel
-                candidates={impactReport?.candidate_tests || []}
+                onSelectExplanatoryPath={setActiveExplanatoryPath}
+                onClearImpact={() => {
+                  setImpactReport(null);
+                  setActiveExplanatoryPath(null);
+                }}
+                onClose={() => {
+                  setSelectedNode(null);
+                  setImpactReport(null);
+                  setActiveExplanatoryPath(null);
+                }}
                 repoPath={repoPath}
               />
             )}
-          </div>
-        </aside>
+          </>
+        ) : (
+          /* Full-Screen Structural Insights & Topology Dossier */
+          <InsightsView
+            nodes={graphData.nodes}
+            edges={graphData.edges}
+            scanResult={scanResult}
+            onNavigateToNode={handleSelectNodeById}
+          />
+        )}
       </div>
 
-      {/* High-Density Bottom Status Bar */}
-      <StatusBar
-        repoPath={repoPath}
-        fingerprint={scanResult?.fingerprint || null}
-        fileCount={scanResult?.file_count || 0}
-        nodeCount={graphData.node_count}
-        edgeCount={graphData.edge_count}
-        cycleCount={cycleCount}
-        dockerAvailable={dockerAvailable}
-        selectedLabel={selectedNode?.label || null}
+      {/* Floating Bottom Telemetry Strip */}
+      <footer className="h-6 bg-obsidian-900 border-t border-obsidian-800 px-3 flex items-center justify-between text-2xs font-mono text-slate-500 select-none z-10">
+        <div className="flex items-center space-x-3">
+          <span className="text-slate-400 font-semibold">{repoPath.split('/').slice(-2).join('/')}</span>
+          {scanResult?.fingerprint && (
+            <span>SHA-256: <strong className="text-slate-400 font-normal">{scanResult.fingerprint.slice(0, 8)}</strong></span>
+          )}
+          <span>{graphData.node_count} nodes</span>
+          <span>{graphData.edge_count} edges</span>
+        </div>
+
+        <div className="flex items-center space-x-3">
+          <span><kbd className="px-1 py-0.2 bg-obsidian-800 rounded">⌘K</kbd> search</span>
+          <span><kbd className="px-1 py-0.2 bg-obsidian-800 rounded">Space</kbd> fit</span>
+          <span><kbd className="px-1 py-0.2 bg-obsidian-800 rounded">Esc</kbd> deselect</span>
+        </div>
+      </footer>
+
+      {/* Command Palette */}
+      <QuickSearchPalette
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        nodes={graphData.nodes}
+        onSelectNode={handleSelectNode}
       />
 
       {/* Modals */}
