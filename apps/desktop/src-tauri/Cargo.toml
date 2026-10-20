@@ -1,0 +1,18 @@
+[package]
+name = "ghostlight-desktop"
+version = "0.1.0"
+edition = "2021"
+authors = ["GHOSTLIGHT Contributors"]
+license = "MIT OR Apache-2.0"
+
+[workspace]
+
+[dependencies]
+ghostlight-core = { path = "../../../crates/ghostlight-core" }
+ghostlight-parser = { path = "../../../crates/ghostlight-parser" }
+ghostlight-graph = { path = "../../../crates/ghostlight-graph" }
+ghostlight-analysis = { path = "../../../crates/ghostlight-analysis" }
+ghostlight-execution = { path = "../../../crates/ghostlight-execution" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tauri = { version = "2.0", default-features = false }

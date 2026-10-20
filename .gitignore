@@ -1,0 +1,22 @@
+# Rust / Cargo
+/target
+
+
+# Node / Frontend
+node_modules/
+dist/
+.vite/
+*.local
+
+# Cache / Temp
+.DS_Store
+*.swp
+*~
+tmp/
+.coverage
+.pytest_cache
+__pycache__/
+*.pyc
+
+# Benchmark outputs
+target/criterion

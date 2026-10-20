@@ -1,0 +1,19 @@
+[package]
+name = "ghostlight-parser"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+ghostlight-core = { workspace = true }
+tree-sitter = { workspace = true }
+tree-sitter-python = { workspace = true }
+walkdir = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
